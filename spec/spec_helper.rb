@@ -4,6 +4,7 @@ require File.expand_path("../../../../config/environment")
 require "spec"
 require "spec/rails"
 require "ruby-debug"
+require "test_notifier/rspec"
 
 ActiveRecord::Base.configurations = {'test' => {:adapter => 'sqlite3', :database => ":memory:"}}
 ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations["test"])

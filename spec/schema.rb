@@ -16,6 +16,7 @@ ActiveRecord::Schema.define(:version => 0) do
   create_table :bookmarks do |t|
     t.references :bookmarkable, :polymorphic => true
     t.references :user
+    t.string :name, :default => nil, :null => true
     t.timestamps
   end
 end

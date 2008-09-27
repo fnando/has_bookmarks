@@ -82,7 +82,7 @@ describe "has_bookmarks" do
     end.should change(Bookmark, :count).by(2)
   end
   
-  it "should get unique users that bookmarked on duff" do
+  it "should get unique users that bookmarked duff" do
     @beer.bookmark(:user => @user)
     @beer.bookmark(:user => @user)
     @beer.bookmark(:user => @another_user)
@@ -90,27 +90,66 @@ describe "has_bookmarks" do
     @beer.find_users_that_bookmarked.should == [@user, @another_user]
   end
   
-  it "should get users that bookmarked only on duff" do
+  it "should get users that bookmarked only duff" do
     @beer.bookmark(:user => @user)
     @donut.bookmark(:user => @another_user)
     
     @beer.find_users_that_bookmarked.should == [@user]
   end
   
+  it "should get users that bookmarked duff as tasty!" do
+    @beer.bookmark(:user => @user, :name => 'tasty!')
+    @beer.bookmark(:user => @user, :name => 'to-buy')
+    @beer.bookmark(:user => @another_user, :name => 'tasty!')
+    
+    @beer.find_users_that_bookmarked(:name => 'tasty!').should == [@user, @another_user]
+  end
+  
   it "should get bookmark from a given user" do
     bookmark = @beer.bookmark(:user => @user)
     one_more_bookmark = @donut.bookmark(:user => @user)
     
-    @beer.find_bookmark_by_user(@user).should == bookmark
+    @beer.find_bookmark_by_user(:user => @user).should == bookmark
   end
   
   it "should mark beer as bookmarked" do
     @beer.bookmark(:user => @user)
-    @beer.should be_bookmarked(@user)
+    @beer.should be_bookmarked(:user => @user)
   end
   
   it "should remove bookmark" do
     @beer.bookmark(:user => @user)
-    @beer.remove_bookmark_for(@user).should be_true
+    @beer.remove_bookmark_for(:user => @user).should be_true
+  end
+  
+  it "should create bookmark with a name" do
+    bookmark = @beer.bookmark(:user => @user, :name => 'tasty!')
+    bookmark.should_not be_new_record
+    bookmark.name.should == 'tasty!'
+  end
+  
+  it "should set named scope for name" do
+    Bookmark.by_name('tasty!').proxy_options.should == {:conditions => ['bookmarks.name = ?', 'tasty!']}
+  end
+  
+  it "should set named scope for user" do
+    Bookmark.by_user(1).proxy_options.should == {:conditions => {:user_id => 1}}
+  end
+  
+  it "should return bookmarks by name" do
+    bookmark = @beer.bookmark(:user => @user, :name => 'tasty!')
+    @beer.bookmark(:user => @user, :name => 'horrible')
+    @beer.bookmarks.by_name('tasty!').should == [bookmark]
+  end
+  
+  it "should return paginated users" do
+    User.delete_all
+    Array(30) do |i| 
+      user = User.create!(:name => "User #{i}")
+      @beer.bookmark(:user => user)
+    end
+    
+    @beer.find_users_that_bookmarked(:page => 1).should == User.all(:limit => 10)
+    @beer.find_users_that_bookmarked(:page => 2).should == User.all(:limit => 10, :offset => 10)
   end
 end

@@ -23,33 +23,57 @@ module SimplesIdeias
       end
       
       module InstanceMethods
-        def find_bookmark_by_user(owner)
-          owner = owner.id if owner.is_a?(User)
-          self.bookmarks.find(:first, :conditions => {:user_id => owner})
+        def find_bookmark_by_user(options={})
+          raise 'User is required' unless options[:user_id] || options[:user]
+          
+          options[:user_id] = options.delete(:user).id if options[:user]
+          bookmarks = self.bookmarks.by_name(options.delete(:name)).by_user(options.delete(:user_id))
+          
+          unless bookmarks.empty?
+            bookmarks[0]
+          else
+            nil
+          end
         end
         
         def bookmark(options)
           self.bookmarks.create(options)
         end
         
-        def remove_bookmark_for(owner)
-          bookmark = find_bookmark_by_user(owner)
-          return true if bookmark.destroy
+        def remove_bookmark_for(options={})
+          bookmark = find_bookmark_by_user(options)
+          return !!bookmark.destroy unless bookmark.nil? 
           return false
         end
         
-        def bookmarked?(owner)
-          !find_bookmark_by_user(owner).nil?
+        def bookmarked?(options)
+          !find_bookmark_by_user(options).nil?
         end
         
         def find_users_that_bookmarked(options={})
+          conditions = [
+            "bookmarks.bookmarkable_type = ? and bookmarks.bookmarkable_id = ?", 
+            self.class.has_bookmarks_options[:type], 
+            self.id
+          ]
+          
+          unless options[:name].blank?
+            conditions[0] += " and bookmarks.name = ?"
+            conditions << options[:name]
+            options.delete(:name)
+          end
+          
           options = {
-            :limit => 20,
-            :conditions => ["bookmarks.bookmarkable_type = ? and bookmarks.bookmarkable_id = ?", self.class.has_bookmarks_options[:type], self.id],
+            :limit => 10,
+            :conditions => conditions,
             :include => :bookmarks
           }.merge(options)
 
-          User.find(:all, options)
+          if Object.const_defined?('Paginate')
+            User.paginate(options)
+          else
+            User.all(options)
+          end
         end
       end
     end

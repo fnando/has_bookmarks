@@ -1,4 +1,17 @@
 class Bookmark < ActiveRecord::Base
+  # scopes
+  named_scope :by_name, lambda { |*name| 
+    if name[0]
+      {:conditions => ['bookmarks.name = ?', name[0]]}
+    else
+      {}
+    end
+  }
+  
+  named_scope :by_user, lambda { |user_id|
+    {:conditions => {:user_id => user_id}}
+  }
+  
   # constants
   MESSAGES = {
     :user_is_required => "is required",
