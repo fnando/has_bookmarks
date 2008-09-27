@@ -4,8 +4,9 @@ has_bookmarks
 Instalation
 -----------
 
-# Install the plugin with `script/plugin install git://github.com/fnando/has_bookmarks.git`
-# Generate a migration with `script/generate migration create_bookmarks` and add the following code:
+1) Install the plugin with `script/plugin install git://github.com/fnando/has_bookmarks.git`
+
+2) Generate a migration with `script/generate migration create_bookmarks` and add the following code:
 
 	class CreateBookmarks < ActiveRecord::Migration
 	  def self.up
