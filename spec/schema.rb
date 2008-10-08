@@ -6,11 +6,11 @@ ActiveRecord::Schema.define(:version => 0) do
   create_table :beers do |t|
     t.string :name
     t.integer :bookmarks_count, :default => 0, :null => false
+    t.integer :tasty_bookmarks_count, :default => 0, :null => false
   end
   
   create_table :donuts do |t|
     t.string :flavor
-    t.integer :bookmarks_count, :default => 0, :null => false
   end
   
   create_table :bookmarks do |t|

@@ -8,6 +8,7 @@ require "test_notifier/rspec"
 
 ActiveRecord::Base.configurations = {'test' => {:adapter => 'sqlite3', :database => ":memory:"}}
 ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations["test"])
+ActiveRecord::Base.logger = Logger.new(Rails.root + '/log/plugin.log')
 
 load('schema.rb')
 
@@ -27,3 +28,5 @@ class Object
     end
   end
 end
+
+alias :doing :lambda

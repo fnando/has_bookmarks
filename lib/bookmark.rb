@@ -20,8 +20,7 @@ class Bookmark < ActiveRecord::Base
   
   # associations
   belongs_to :bookmarkable, 
-    :polymorphic => true, 
-    :counter_cache => true
+    :polymorphic => true
   
   belongs_to :user
   
@@ -32,4 +31,21 @@ class Bookmark < ActiveRecord::Base
   validates_uniqueness_of :user_id,
     :scope => [:bookmarkable_type, :bookmarkable_id],
     :message => MESSAGES[:has_already_bookmarked]
+  
+  # callbacks
+  after_create    :increment_bookmark_counters
+  before_destroy  :decrement_bookmark_counters
+  
+  private
+    def increment_bookmark_counters
+      counter_name = "#{name}_bookmarks_count"
+      bookmarkable.class.increment_counter(counter_name, bookmarkable.id) if bookmarkable.respond_to?(counter_name)
+      bookmarkable.class.increment_counter(:bookmarks_count, bookmarkable.id) if bookmarkable.respond_to?(:bookmarks_count)
+    end
+    
+    def decrement_bookmark_counters
+      counter_name = "#{name}_bookmarks_count"
+      bookmarkable.class.decrement_counter(counter_name, bookmarkable.id) if bookmarkable.respond_to?(counter_name)
+      bookmarkable.class.decrement_counter(:bookmarks_count, bookmarkable.id) if bookmarkable.respond_to?(:bookmarks_count)
+    end
 end

@@ -6,7 +6,8 @@ Instalation
 
 1) Install the plugin with `script/plugin install git://github.com/fnando/has_bookmarks.git`
 
-2) Generate a migration with `script/generate migration create_bookmarks` and add the following code:
+2) Generate a migration with `script/generate migration create_bookmarks`
+and add the following code:
 
 	class CreateBookmarks < ActiveRecord::Migration
 	  def self.up
@@ -65,13 +66,25 @@ If you have different types of bookmarks, you can use the option `:name`:
 	product.find_users_that_bookmarked(:name => 'wishlist')
 	product.find_bookmark_by_user(:user => user, :name => 'wishlist')
 	product.remove_bookmark_for(:user => user, :name => 'wishlist')
+	
+To retrieve bookmarks from an user:
+
+	user.bookmarks
+	user.bookmarks.by_name('wishlist')
 
 If you have [has_paginate](http://github.com/fnando/has_paginate) installed, 
 you can paginate the users that bookmarked a given item:
 
 	product.find_users_that_bookmarked(:page => 2)
+	user.bookmarks.by_name('wishlist').paginate(params[:page])
 
-NOTE: You should have a User model. You should also have a bookmarks_count 
-column on your model. **Otherwise, this won't work!**
+Optionally, you can have counter columns for general/named bookmarks. If your
+model doesn't have counter columns, nothing will happen.
+
+	product.bookmark(:user => user) # => update bookmarks_count
+	product.bookmark(:user => user, :name => 'wishlist') # => update wishlist_bookmarks_count
+
+
+NOTE: You should have a User model. **Otherwise, this won't work!**
 
 Copyright (c) 2008 Nando Vieira, released under the MIT license

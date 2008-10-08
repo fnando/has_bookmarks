@@ -27,16 +27,12 @@ module SimplesIdeias
           raise 'User is required' unless options[:user_id] || options[:user]
           
           options[:user_id] = options.delete(:user).id if options[:user]
-          bookmarks = self.bookmarks.by_name(options.delete(:name)).by_user(options.delete(:user_id))
-          
-          unless bookmarks.empty?
-            bookmarks[0]
-          else
-            nil
-          end
+          result = self.bookmarks.by_name(options.delete(:name)).by_user(options.delete(:user_id))
+          result[0]
         end
         
         def bookmark(options)
+          options[:user_id] = options.delete(:user).id if options[:user]
           self.bookmarks.create(options)
         end
         
