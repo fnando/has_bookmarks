@@ -228,4 +228,12 @@ describe "has_bookmarks" do
     @beer.bookmarks.should_receive(:create).with(:user_id => @user.id, :name => 'tasty')
     @beer.bookmark(:user_id => @user.id, :name => 'tasty')
   end
+  
+  it "should have multiple bookmarks" do
+    tasty = @beer.bookmark(:user => @user, :name => 'tasty')
+    tasty.should be_valid
+    
+    to_buy = @beer.bookmark(:user => @user, :name => 'to_buy')
+    to_buy.should be_valid
+  end
 end

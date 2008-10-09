@@ -29,7 +29,7 @@ class Bookmark < ActiveRecord::Base
     :message => MESSAGES[:user_is_required]
   
   validates_uniqueness_of :user_id,
-    :scope => [:bookmarkable_type, :bookmarkable_id],
+    :scope => [:bookmarkable_type, :bookmarkable_id, :name],
     :message => MESSAGES[:has_already_bookmarked]
   
   # callbacks
