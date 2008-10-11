@@ -24,7 +24,7 @@ module SimplesIdeias
       
       module InstanceMethods
         def find_bookmark_by_user(options={})
-          raise 'User is required' unless options[:user_id] || options[:user]
+          return nil unless options[:user_id] || options[:user]
           
           options[:user_id] = options.delete(:user).id if options[:user]
           result = self.bookmarks.by_name(options.delete(:name)).by_user(options.delete(:user_id))

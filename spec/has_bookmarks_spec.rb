@@ -236,4 +236,9 @@ describe "has_bookmarks" do
     to_buy = @beer.bookmark(:user => @user, :name => 'to_buy')
     to_buy.should be_valid
   end
+  
+  it "should return nil if no user is informed" do
+    @beer.bookmarked?(:user => nil).should be_false
+    @beer.bookmarked?(:user_id => nil).should be_false
+  end
 end
